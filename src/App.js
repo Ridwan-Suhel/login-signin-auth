@@ -4,6 +4,7 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   sendEmailVerification,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import app from "./firebase.init";
@@ -78,6 +79,12 @@ function App() {
     }
   };
 
+  const handlePasswordReset = () => {
+    sendPasswordResetEmail(auth, email).then(() => {
+      console.log("Password Reset message sent");
+    });
+  };
+
   const sendVerification = () => {
     sendEmailVerification(auth.currentUser).then(() => {
       console.log("Email Verification sent");
@@ -125,6 +132,13 @@ function App() {
                   type="checkbox"
                   label="Already Registered?"
                 />
+                <Button
+                  onClick={handlePasswordReset}
+                  variant="link"
+                  className="p-0"
+                >
+                  Forgot password?
+                </Button>
               </Form.Group>
               <Button variant="primary" type="submit">
                 {registered ? "LogIn" : "Register"}
