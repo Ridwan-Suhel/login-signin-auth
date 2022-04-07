@@ -24,6 +24,11 @@ function App() {
   const handlePassBlur = (event) => {
     setPassword(event.target.value);
   };
+
+  const handleRegister = (event) => {
+    setRegister(event.target.checked);
+    console.log(event.target.checked);
+  };
   const handleSubmitForm = (event) => {
     console.log(email, password);
     event.preventDefault();
@@ -60,7 +65,9 @@ function App() {
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-7">
-            <h3 className="my-3 text-primary">Register Form</h3>
+            <h3 className="my-3 text-primary">
+              Please {register ? "LogIn" : "Register"}
+            </h3>
             <Form noValidate validated={validated} onSubmit={handleSubmitForm}>
               <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label>Email address</Form.Label>
@@ -90,13 +97,13 @@ function App() {
               </Form.Group>
               <Form.Group className="mb-3" controlId="formBasicCheckbox">
                 <Form.Check
-                  // onChange={handleRegister}
+                  onChange={handleRegister}
                   type="checkbox"
                   label="Already Registered?"
                 />
               </Form.Group>
               <Button variant="primary" type="submit">
-                Register
+                {register ? "LogIn" : "Register"}
               </Button>
             </Form>
           </div>
