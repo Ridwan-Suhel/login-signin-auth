@@ -1,6 +1,11 @@
 import "./App.css";
 
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  sendEmailVerification,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import app from "./firebase.init";
 import { Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -12,7 +17,7 @@ function App() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [register, setRegister] = useState(false);
+  const [registered, setRegister] = useState(false);
 
   const [validated, setValidated] = useState(false);
 
@@ -47,17 +52,36 @@ function App() {
 
     setError("");
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((result) => {
-        const user = result.user;
-        console.log(user);
-        setEmail("");
-        setPassword("");
-      })
-      .catch((error) => {
-        const errorMessage = error.message;
-        setError(errorMessage);
-      });
+    if (registered) {
+      signInWithEmailAndPassword(auth, email, password)
+        .then((result) => {
+          const user = result.user;
+          console.log(user);
+        })
+        .catch((error) => {
+          const errorMessage = error.message;
+          setError(errorMessage);
+        });
+    } else {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((result) => {
+          const user = result.user;
+          console.log(user);
+          setEmail("");
+          setPassword("");
+          sendVerification();
+        })
+        .catch((error) => {
+          const errorMessage = error.message;
+          setError(errorMessage);
+        });
+    }
+  };
+
+  const sendVerification = () => {
+    sendEmailVerification(auth.currentUser).then(() => {
+      console.log("Email Verification sent");
+    });
   };
 
   return (
@@ -66,7 +90,7 @@ function App() {
         <div className="row justify-content-center">
           <div className="col-7">
             <h3 className="my-3 text-primary">
-              Please {register ? "LogIn" : "Register"}
+              Please {registered ? "LogIn" : "Register"}
             </h3>
             <Form noValidate validated={validated} onSubmit={handleSubmitForm}>
               <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -103,7 +127,7 @@ function App() {
                 />
               </Form.Group>
               <Button variant="primary" type="submit">
-                {register ? "LogIn" : "Register"}
+                {registered ? "LogIn" : "Register"}
               </Button>
             </Form>
           </div>
