@@ -6,6 +6,7 @@ import {
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import app from "./firebase.init";
 import { Button, Form } from "react-bootstrap";
@@ -16,8 +17,10 @@ const auth = getAuth(app);
 
 function App() {
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const [registered, setRegister] = useState(false);
 
   const [validated, setValidated] = useState(false);
@@ -26,6 +29,9 @@ function App() {
 
   const handleEmailBlur = (event) => {
     setEmail(event.target.value);
+  };
+  const handleNameBlur = (event) => {
+    setName(event.target.value);
   };
   const handlePassBlur = (event) => {
     setPassword(event.target.value);
@@ -71,6 +77,8 @@ function App() {
           setEmail("");
           setPassword("");
           sendVerification();
+          setSuccessMsg("User added SUCCESSFULLY!");
+          setUserName();
         })
         .catch((error) => {
           const errorMessage = error.message;
@@ -83,6 +91,18 @@ function App() {
     sendPasswordResetEmail(auth, email).then(() => {
       console.log("Password Reset message sent");
     });
+  };
+
+  const setUserName = () => {
+    updateProfile(auth.currentUser, {
+      displayName: name,
+    })
+      .then(() => {
+        console.log("Name Updated");
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
   };
 
   const sendVerification = () => {
@@ -100,6 +120,21 @@ function App() {
               Please {registered ? "LogIn" : "Register"}
             </h3>
             <Form noValidate validated={validated} onSubmit={handleSubmitForm}>
+              {!registered && (
+                <Form.Group className="mb-3" controlId="formBasicName">
+                  <Form.Label>Name</Form.Label>
+                  <Form.Control
+                    onBlur={handleNameBlur}
+                    type="name"
+                    placeholder="Enter Your Name"
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please provide a valid email.
+                  </Form.Control.Feedback>
+                </Form.Group>
+              )}
+
               <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label>Email address</Form.Label>
                 <Form.Control
@@ -125,6 +160,7 @@ function App() {
                   Please provide a valid password.
                 </Form.Control.Feedback>
                 <p className="my-3 text-danger">{error}</p>
+                <p className="my-3 text-success">{successMsg}</p>
               </Form.Group>
               <Form.Group className="mb-3" controlId="formBasicCheckbox">
                 <Form.Check
